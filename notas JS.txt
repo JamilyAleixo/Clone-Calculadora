@@ -1,0 +1,195 @@
+// Seleciona o elemento 'display' onde os números e resultados serão exibidos.
+const display = document.getElementById('display')
+
+// Armazena o texto atual do 'display' para referência.
+const displayText = document.getElementById('display').textContent
+
+// Seleciona os elementos de botões da calculadora que serão usados para operações.
+const igual = document.getElementById('igual')
+const apagar = document.getElementById('apagar')
+const maismenos = document.getElementById('maismenos')
+const limparCalculo = document.getElementById('limparCalculo')
+const limparTudo = document.getElementById('limparTudo')
+const porc = document.getElementById('porc')
+const virg = document.getElementById('virg')
+const divisaoUm = document.getElementById('divisaoUm')
+const potencia = document.getElementById('potencia')
+const raiz = document.getElementById('raiz')
+
+// Seleciona todos os elementos de botões numéricos (0-9) e de operadores.
+const nums = document.querySelectorAll("[id*=num]")
+const operadores = document.querySelectorAll("[id*=sinal]")
+
+// Variáveis de controle para rastrear o estado da calculadora.
+let primeiro = true
+let operador
+let numeroAnterior
+let numeroAtual
+let apagarIgual
+
+// Função para substituir um ponto por uma vírgula no texto do 'display'.
+const ajustaPontoVirgula = () => display.textContent = display.textContent.replace('.', ',')
+
+// Função para inserir texto no 'display'.
+const inserirDisplay = text => {
+
+  // Verifica se é o primeiro caractere após uma operação.
+  if (primeiro) {
+    display.textContent = text
+    primeiro = false
+  } else {
+    display.textContent += text
+  }
+
+  // Limita o texto do 'display' a 17 caracteres.
+  display.textContent = display.textContent.substring(0, 17)
+  numeroAtual = display.textContent
+  apagarIgual = true
+}
+
+// Função para inserir dígitos nos botões numéricos.
+const inserir = e => inserirDisplay(e.target.textContent)
+
+// Adiciona um ouvinte de eventos de clique a cada botão numérico.
+nums.forEach(e => e.addEventListener('click', inserir))
+
+// Função para inserir operadores nos botões de operação.
+const inserirOperador = e => {
+  primeiro = true
+  operador = e.target.textContent
+
+  // Converte operadores especiais ('x' e '÷') em '*' e '/'.
+  if (operador == 'x') {
+    operador = '*'
+  } else if (operador == '÷') {
+    operador = '/'
+  }
+  
+  numeroAnterior = display.textContent
+}
+
+// Adiciona um ouvinte de eventos de clique a cada botão de operação.
+operadores.forEach(e => e.addEventListener('click', inserirOperador))
+
+// Função para realizar cálculos.
+const calcular = () => {
+
+  if (numeroAnterior && operador) {
+    let result = numeroAnterior + operador
+
+    if (numeroAtual) {
+      result += numeroAtual
+    } else {
+      result += numeroAnterior
+    }
+
+    // Avalia a expressão e atualiza o 'display'.
+    display.textContent = eval(result.replace(',', '.'))
+    ajustaPontoVirgula()
+
+    // Se o resultado for 'NaN', exibe '0'.
+    if (display.textContent == 'NaN') {
+      display.textContent = '0'
+    }
+
+    numeroAnterior = display.textContent
+    primeiro = true
+    apagarIgual = false
+  }
+}
+
+// Adiciona um ouvinte de eventos de clique ao botão de igual.
+igual.addEventListener('click', calcular)
+
+// Função para apagar o último caractere do 'display'.
+const apagarUltimo = () => {
+  if (apagarIgual) {
+    if (display.textContent.length > 1) {
+      display.textContent = display.textContent.slice(0, -1)
+    } else {
+      display.textContent = 0
+    }
+    
+    primeiro = true
+  }
+}
+
+// Adiciona um ouvinte de eventos de clique ao botão de apagar.
+apagar.addEventListener('click', apagarUltimo)
+
+// Função para inverter o sinal do número.
+const inverteSinal = () => {
+  display.textContent = parseFloat(display.textContent.replace(',', '.')) * -1
+  ajustaPontoVirgula()
+}
+
+// Adiciona um ouvinte de eventos de clique ao botão de mais/menos.
+maismenos.addEventListener('click', inverteSinal)
+
+// Função para limpar o cálculo atual.
+const limpaCalculo = () => {
+  display.textContent = '0'
+  primeiro = true
+}
+
+// Adiciona um ouvinte de eventos de clique ao botão de limpar cálculo.
+limparCalculo.addEventListener('click', limpaCalculo)
+
+// Função para limpar tudo (zerar a calculadora).
+const limpaTudo = () => {
+  display.textContent = '0'
+  numeroAnterior = '0'
+  numeroAtual = '0'
+  primeiro = true
+}
+
+// Adiciona um ouvinte de eventos de clique ao botão de limpar tudo.
+limparTudo.addEventListener('click', limpaTudo)
+
+// Função para calcular a porcentagem do número atual.
+const calcPorc = () => {
+  display.textContent = parseFloat(display.textContent.replace(',', '.')) / 100
+  ajustaPontoVirgula()
+  numeroAtual = display.textContent
+  primeiro = true
+}
+
+// Adiciona um ouvinte de eventos de clique ao botão de porcentagem.
+porc.addEventListener('click', calcPorc)
+
+// Função para calcular a divisão por um número.
+const calcDivisaoUm = () => {
+  display.textContent = 1 / parseFloat(display.textContent.replace(',', '.')) 
+  ajustaPontoVirgula()
+  numeroAtual = display.textContent
+  numeroAnterior = '0'
+  primeiro = true
+}
+
+// Adiciona um ouvinte de eventos de clique ao botão de divisão por um.
+divisaoUm.addEventListener('click', calcDivisaoUm)
+
+// Função para calcular a potência quadrada do número atual.
+const calcPotencia = () => {
+  display.textContent = Math.pow(parseFloat(display.textContent.replace(',', '.')), 2)
+  ajustaPontoVirgula()
+  numeroAtual = display.textContent
+  numeroAnterior = '0'
+  primeiro = true
+}
+
+// Adiciona um ouvinte de eventos de clique ao botão de potência.
+potencia.addEventListener('click', calcPotencia)
+
+// Função para calcular a raiz quadrada do número atual.
+const calcRaiz = () => {
+  display.textContent = Math.sqrt(parseFloat(display.textContent.replace(',', '.')))
+  ajustaPontoVirgula()
+  numeroAtual = display.textContent
+  numeroAnterior = '0'
+  primeiro = true
+}
+
+// Adiciona um ouvinte de eventos de clique ao botão de raiz.
+raiz.addEventListener('click', calcRaiz)
+
